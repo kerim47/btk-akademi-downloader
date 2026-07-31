@@ -1,5 +1,8 @@
 name: Build and Release Standalone Binaries
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
