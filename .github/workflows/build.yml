@@ -1,0 +1,76 @@
+name: Build and Release Standalone Binaries
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: BTK_Downloader-Linux-x86_64
+          - os: windows-latest
+            asset_name: BTK_Downloader-Windows-x64.exe
+          - os: macos-latest
+            asset_name: BTK_Downloader-macOS
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PySide6 requests yt-dlp pyinstaller
+
+      - name: Build Executable with PyInstaller
+        run: |
+          pyinstaller --onefile --noconsole --name "BTK_Downloader" btk_downloader.py
+
+      - name: Rename Binary
+        shell: bash
+        run: |
+          mkdir -p release_assets
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            mv dist/BTK_Downloader.exe release_assets/${{ matrix.asset_name }}
+          else
+            mv dist/BTK_Downloader release_assets/${{ matrix.asset_name }}
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: release_assets/${{ matrix.asset_name }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: BTK Akademi Video İndirici v1.0.0
+          files: ./artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
