@@ -106,9 +106,7 @@ class BTKApi:
 
     @staticmethod
     def get_syllabus(course_id: str, access_token: str) -> tuple[bool, list, str]:
-        url = f"{BASE_URL}/public/51/course/details/program/syllabus/{
-            course_id
-        }?language=tr"
+        url = f"{BASE_URL}/public/51/course/details/program/syllabus/{course_id}?language=tr"
         try:
             res = requests.get(
                 url, headers=BTKApi.get_headers(access_token), timeout=30
@@ -237,9 +235,7 @@ class DownloadWorker(QThread):
             les_id = str(item["les_id"])
 
             self.log_signal.emit(
-                f"\n[{index}/{total_items}] Başlatılıyor: B{sec_idx + 1}.D{
-                    les_idx + 1
-                } - {les_title}"
+                f"\n[{index}/{total_items}] Başlatılıyor: B{sec_idx + 1}.D{les_idx + 1} - {les_title}"
             )
 
             save_dir = self.download_dir / (
@@ -262,11 +258,7 @@ class DownloadWorker(QThread):
 
             if not video_id:
                 if "404" in err_msg:
-                    self.log_signal.emit(
-                        f"  ❌ HATA: {
-                            err_msg
-                        }\n  💡 İPUCU: Kursa kaydolmamış olabilirsiniz. 'Kursa Otomatik Kaydol' seçeneğini aktif edin."
-                    )
+                    self.log_signal.emit(f"  ❌ HATA: {err_msg}. 💡 İPUCU: Kursa kaydolmamış olabilirsiniz. 'Kursa Otomatik Kaydol' seçeneğini aktif edin.")
                 else:
                     self.log_signal.emit(f"  ❌ HATA: {err_msg}")
                 continue
@@ -826,16 +818,12 @@ class ModernBTKDownloader(QMainWindow):
             )
         else:
             self.log(
-                f"\n🎉 İndirme işlemi tamamlandı! ({downloaded_count}/{
-                    total_count
-                } ders indirildi)"
+                f"\n🎉 İndirme işlemi tamamlandı! ({downloaded_count}/{total_count} ders indirildi)"
             )
             QMessageBox.information(
                 self,
                 "Başarılı",
-                f"İndirme işlemi tamamlandı!\n({downloaded_count}/{
-                    total_count
-                } ders indirildi)",
+                f"İndirme işlemi tamamlandı!\n({downloaded_count}/{total_count} ders indirildi)",
             )
 
     def apply_stylesheet(self):
